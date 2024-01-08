@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
-
+require("dotenv").config();
 const Url = process.env.MONGOURL || "";
-console.log(Url);
 
 //localhost:27017/fleet
 
