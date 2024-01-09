@@ -19,8 +19,13 @@ const sendEmail = async (data) => {
   // const toAddress = process.env.TO_ADDRESS;
 
   // Create a message object
-  const { name, email, verificationToken } = data;
-  console.log(name, email, verificationToken);
+  const {
+    name,
+    email,
+    verificationToken = null,
+    otpVerification = null,
+  } = data;
+  console.log(name, email, verificationToken, otpVerification);
   const verificationLink = `https://example.com/verify?token=${verificationToken}`; // Replace example.com with your actual verification route
 
   const mailOptions = {
@@ -63,10 +68,13 @@ const sendEmail = async (data) => {
     <p>
     I hope this email finds you well.
     </p>
-
-    <p>Please click the following link to verify your email:</p>
-    <a href="${verificationLink}" style="display: inline-block; padding: 10px 20px; background-color: blue; color: white; text-decoration: none; border-radius: 5px;">Link to verify</a>
-
+    ${
+      otp
+        ? `<h4>your opt code : ${otp}</h4>`
+        : `<p>Please click the following link to verify your email:
+  <a href="${verificationLink}" style="display: inline-block; padding: 10px 20px; background-color: blue; color: white; text-decoration: none; border-radius: 5px;">Link to verify</a></p>`
+    }
+     
     <h3>Sincerely,</h3>
     </body>
     </html>
