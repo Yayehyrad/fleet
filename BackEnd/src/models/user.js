@@ -45,6 +45,7 @@ const userSchima = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    default: "pending",
   },
 
   tokens: [
@@ -61,6 +62,12 @@ userSchima.virtual("tasks", {
   ref: "Task",
   localField: "_id",
   foreignField: "owner",
+});
+
+userSchima.virtual("userVerification", {
+  ref: "UserVerification",
+  localField: "_id",
+  foreignField: "userId",
 });
 
 userSchima.methods.generateAuthToken = async function () {

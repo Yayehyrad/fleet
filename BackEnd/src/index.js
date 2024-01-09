@@ -8,7 +8,7 @@ const swaggerDoccs = require("./helper/documentation");
 const userRouter = require("./routers/user");
 const taskRouter = require("./routers/task");
 const fleetRouter = require("./routers/fleet");
-const activityRouter = require("./routers/activity");
+// const activityRouter = require("./routers/activity");
 
 const app = express();
 
@@ -31,7 +31,7 @@ app.use("/documentatins", swaggerDoc.setup(swaggerDoccs));
 app.use(userRouter);
 app.use(taskRouter);
 app.use(fleetRouter);
-app.use(activityRouter);
+// app.use(activityRouter);
 
 app.listen(port, () => {
   console.log("running at 300");
