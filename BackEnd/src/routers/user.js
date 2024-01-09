@@ -28,6 +28,7 @@ router.post("/users" ,validateUserInput, async (req , res)=>{
 
         const activiy = new Activity(payload)
         await activiy.save()
+        
     }catch(error){
         res.status(500).send(error.message)
     }    
