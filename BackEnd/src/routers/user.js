@@ -1,11 +1,13 @@
-const express = require('express')
-const User = require('../models/user') 
+const express = require("express");
+const User = require("../models/user");
+const UserVerification = require("../models/userVerification");
 const Activity = require('../models/activity')
-const auth = require('../middleware/auth')
+const auth = require("../middleware/auth");
 const manager_auth = require('../middleware/manager_auth')
 const admin_auth = require("../middleware/admin_auth")
 const validateUserInput = require("../middleware/validator")
-const router = new express.Router()
+const router = new express.Router();
+const sendEmail = require("../helper/mail");
 const check_attempt = require("../middleware/check_attempt")
 
 
@@ -133,6 +135,6 @@ router.delete('/user/:id', async (req,res)=>{
     }
 })
 
-// update 
- 
-module.exports = router
+// update
+
+module.exports = router;

@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
-
-const Url = process.env.MONGOURL || "mongodb+srv://imranhayredin89:p3Xp8z7dwdYKBDyi@cluster0.gpom6d9.mongodb.net/Fleet?retryWrites=true&w=majority";
-//console.log(Url);
+require("dotenv").config();
+const Url = process.env.MONGOURL || "";
 
 //localhost:27017/fleet
 
