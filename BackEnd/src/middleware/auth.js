@@ -9,6 +9,16 @@ const auth = async (req,res,next)=>{
         if(!user){
             throw new Error('')
         }
+        if(user.status === "pending")
+        {
+            return res.status(401).send({error : "Please Verify Your Email"})
+
+        }
+        if(user.status === "blocked")
+        {
+            return res.status(401).send({error : "Your account is temporarly blocked"})
+
+        }
         req.token = token
         req.user = user
         next()
@@ -16,6 +26,20 @@ const auth = async (req,res,next)=>{
         res.status(401).send({error : "unAuthorized"})
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
