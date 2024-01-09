@@ -1,6 +1,7 @@
 const express = require("express");
 const User = require("../models/user");
 const UserVerification = require("../models/userVerification");
+const Otp = require("../models/otp");
 const auth = require("../middleware/auth");
 const router = new express.Router();
 const sendEmail = require("../helper/mail");
@@ -132,8 +133,13 @@ router.get("/user/verify", async (req, res) => {
   // });
   try {
     const verification = await UserVerification.verify(req.query);
-    if (verification == "success") {
-      res.status(200).send("success");
+    if (verification.status == "success") {
+      const user = await User.findById({ _id: verification.id });
+      user.status = "active";
+      await user.save();
+
+      res.redirect(`http://localhost:3001/newurl`);
+      // res.status(200).send("success");
     } else {
       throw new Error(verification.message);
     }
@@ -141,7 +147,78 @@ router.get("/user/verify", async (req, res) => {
     res.status(500).send(e.message);
   }
 });
+router.post("/user/generateotp", async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
+  try {
+    //send email to the user with a confirmation link
+    const otp = new Otp({
+      userId: user._id,
+    });
+    //save otp
+    await otp.save();
+    // verification token
+    const generatedOtp = await otp.generateOtp();
+    // send email
+    const data = {
+      name: user.name,
+      email: user.email,
+      otpVerification: generatedOtp,
+    };
+    await sendEmail(data);
 
-// update
+    res.status(201).send({ s: "success" });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+router.post("/user/verifyotp", async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
+  try {
+    //send email to the user with a confirmation link
+    const otp = new Otp({
+      userId: user._id,
+    });
+    //save otp
+    await otp.save();
+    // verification token
+    const generatedOtp = await otp.generateOtp();
+    // send email
+    const data = {
+      name: user.name,
+      email: user.email,
+      otpVerification: generatedOtp,
+    };
+    await sendEmail(data);
+
+    res.status(201).send({ s: "success" });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+router.get("/user/verifyotp/:id", async (req, res) => {
+  try {
+    const otp = await Otp.findById(req.params.id);
+    if (!otp) {
+      return res.status(404).send("OTP not found");
+    }
+    const currentDate = new Date();
+    if (otp.expiresAt < currentDate) {
+      return res.status(400).send("OTP is expired");
+    }
+    if (otp.otpVerification !== req.query.code) {
+      return res.status(400).send("Invalid OTP verification code");
+    }
+    const user = await User.findById(otp.userId);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    const authToken = await user.generateAuthToken();
+
+    res.status(200).send({ user, authToken });
+  } catch (e) {
+    res.status(500).send(e.message);
+  }
+});
 
 module.exports = router;

@@ -24,12 +24,6 @@ const userVerificationSchema = new mongoose.Schema({
   //   },
 });
 
-const decoded = jwt.verify(
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTlkMTJmMzAxMzBlNDkyNzI1ZmU3MDkiLCJpYXQiOjE3MDQ3OTI4MTl9.VsInVeXb8zT1TqHMM7QJhdQSJoc8f-09p8ijLnJr1RY",
-  "fightlikeurthethirdmonkey"
-);
-console.log(decoded);
-
 userVerificationSchema.methods.generateAuthToken = async function () {
   const token = jwt.sign(
     { _id: this._id.toString() },
@@ -61,7 +55,7 @@ userVerificationSchema.statics.verify = async (query) => {
     }
     verification.isVerified = true;
     await verification.save();
-    return "verified";
+    return { message: "verified", id: verification.userId, status: "success" };
   } catch (e) {
     return e;
   }
