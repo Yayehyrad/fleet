@@ -7,7 +7,21 @@ const activitySchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  timestamps: true,
+  timestamps:{
+    type:Date
+  },
+  user_name:{
+    type: String,
+    required: true,
+    trim: true,
+
+  },
+  Ip:{
+    type: String,
+    required: false,
+    
+
+  },
 });
 
 // userSchima.methods.generateAuthToken = async function(){

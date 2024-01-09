@@ -5,5 +5,16 @@ const Url = process.env.MONGOURL || "";
 //localhost:27017/fleet
 
 // add an array
+try{
+    mongoose.connect(Url, { useNewUrlParser: true });
+    console.log("connected")
 
-mongoose.connect(Url, { useNewUrlParser: true });
+
+}
+
+catch(e)
+{
+    console.log(e)
+}
+
+

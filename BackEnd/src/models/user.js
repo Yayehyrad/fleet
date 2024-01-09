@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Task = require("./task");
 
+
 const userSchima = new mongoose.Schema({
   name: {
     type: String,
@@ -47,6 +48,12 @@ const userSchima = new mongoose.Schema({
     trim: true,
     default: "pending",
   },
+  attempts:{
+    type: Number,
+    required: false,
+    
+
+  },
 
   tokens: [
     {
@@ -71,10 +78,17 @@ userSchima.virtual("userVerification", {
 });
 
 userSchima.methods.generateAuthToken = async function () {
-  const token = jwt.sign(
-    { _id: this._id.toString() },
-    "fightlikeurthethirdmonkey"
-  );
+
+  const payload = {
+    _id : this._id ,
+    user_name :this.user_name,
+    role:this.role,
+    state:this.status
+  }
+  const token = jwt.sign( payload,
+  "fightlikeurthethirdmonkey"
+);
+   
   this.tokens = this.tokens.concat({ token });
   await this.save();
   return token;
@@ -96,6 +110,19 @@ userSchima.statics.findByCredentias = async (email, password) => {
   }
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
+   var attempt = user.attempts
+   if(attempt < 3)
+   {
+    attempt++
+    await User.findOneAndUpdate({"user_name":user.user_name},{"attempts":attempt})
+   }
+   else{
+    await User.findOneAndUpdate({"user_name":user.user_name},{"status":"blocked"})
+
+    throw new Error('Account Blocked');
+   }
+    
+    
     throw new Error(" invalid email or password");
   }
   return user;

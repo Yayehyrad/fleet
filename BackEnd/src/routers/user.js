@@ -2,11 +2,18 @@ const express = require("express");
 const User = require("../models/user");
 const UserVerification = require("../models/userVerification");
 const Otp = require("../models/otp");
+const Activity = require("../models/activity");
+
 const auth = require("../middleware/auth");
+const manager_auth = require("../middleware/manager_auth");
+const admin_auth = require("../middleware/admin_auth");
+const validateUserInput = require("../middleware/validator");
+
 const router = new express.Router();
 const sendEmail = require("../helper/mail");
+const check_attempt = require("../middleware/check_attempt");
 
-router.post("/users", async (req, res) => {
+router.post("/users", validateUserInput, async (req, res) => {
   const user = new User(req.body);
   try {
     //save user
@@ -17,11 +24,8 @@ router.post("/users", async (req, res) => {
     });
     //save verification
     await userVerification.save();
-
     const token = await user.generateAuthToken();
-    // verification token
     const vtoken = await userVerification.generateAuthToken();
-
     // send email
     const data = {
       name: user.name,
@@ -29,11 +33,18 @@ router.post("/users", async (req, res) => {
       verificationToken: vtoken,
     };
     await sendEmail(data);
-    // console.log(message);
-
-    // console.log(user, userVerification);
 
     res.status(201).send({ user, token, userVerification, vtoken });
+
+    const payload = {
+      description: "Registration of a new user",
+      user_name: req.body.user_name,
+      timestamps: Date.now(),
+      Ip: req.ip,
+    };
+
+    const activiy = new Activity(payload);
+    await activiy.save();
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -41,7 +52,19 @@ router.post("/users", async (req, res) => {
 router.post("/user/login", async (req, res) => {
   try {
     const user = await User.findByCredentias(req.body.email, req.body.password);
+
     const token = await user.generateAuthToken();
+
+    const payload = {
+      description: "Login Activity",
+      user_name: user.user_name,
+      timestamps: Date.now(),
+      Ip: req.ip,
+    };
+
+    const activiy = new Activity(payload);
+    await activiy.save();
+
     res.send({ user, token });
   } catch (e) {
     res.status(400).send(e.message);
@@ -53,7 +76,64 @@ router.get("/users/me", auth, async (req, res) => {
   } catch (e) {
     res.status(500).send(error.message);
   }
+
+  //   res.status(200).send(user);
+  // } catch (e) {
+  //   res.status(500).send(e.message);
+  // }
 });
+router.post("/sendemail", async (req, res) => {
+  const data = { name: "yayeh" };
+  console.log(data);
+  await sendEmail(data);
+  res.status(200).send("success");
+});
+router.get("/user/verify", async (req, res) => {
+  //verify
+  // const { vtoken } = req.query;
+  // const decoded = jwt.verify(vtoken, "fightlikeurthethirdmonkey");
+  // const user = await userVerification.findOne({
+  //   _id: decoded._id,
+  //   verificationToken: vtoken,
+  // });
+  try {
+    const verification = await UserVerification.verify(req.query);
+    if (verification.status == "success") {
+      const user = await User.findById({ _id: verification.id });
+      user.status = "active";
+      await user.save();
+
+      res.redirect(`http://localhost:3001/newurl`);
+      // res.status(200).send("success");
+    } else {
+      throw new Error(verification.message);
+    }
+  } catch (e) {
+    res.status(500).send(e.message);
+  }
+});
+// router.post("/user/generateotp", async (req, res) => {
+//   const user = await User.findOne({ email: req.body.email });
+//   try {
+//     //send email to the user with a confirmation link
+//     const otp = new Otp({
+//       userId: user._id,
+//     });
+//     //save otp
+//     await otp.save();
+//     // verification token
+//     const generatedOtp = await otp.generateOtp();
+//     // send email
+//     const data = {
+//       name: user.name,
+//       email: user.email,
+//       otpVerification: generatedOtp,
+//     };
+//     await sendEmail(data);
+//   }catch(e){
+//     res.status()
+//   }
+// })
 router.post("/user/logout", auth, async (req, res) => {
   try {
     req.user.tokens = req.user.tokens.filter((token) => {
@@ -61,6 +141,15 @@ router.post("/user/logout", auth, async (req, res) => {
       return token.token !== req.token;
     });
     await req.user.save();
+    const payload = {
+      description: "Logout Activity",
+      user_name: req.user.user_name,
+      timestamps: Date.now(),
+      Ip: req.ip,
+    };
+
+    const activiy = new Activity(payload);
+    await activiy.save();
     res.send();
   } catch (e) {
     res.status(500).send();
@@ -98,7 +187,7 @@ router.patch("/user/update", auth, async (req, res) => {
     res.status(500).send(e.message);
   }
 });
-router.delete("/user/delete", auth, async (req, res) => {
+router.delete("/user/delete", auth, admin_auth, async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.user._id);
     res.status(200).send(user);
@@ -115,60 +204,6 @@ router.delete("/user/:id", async (req, res) => {
     res.status(200).send(user);
   } catch (e) {
     res.status(500).send(e.message);
-  }
-});
-router.post("/sendemail", async (req, res) => {
-  const data = { name: "yayeh" };
-  console.log(data);
-  await sendEmail(data);
-  res.status(200).send("success");
-});
-router.get("/user/verify", async (req, res) => {
-  //verify
-  // const { vtoken } = req.query;
-  // const decoded = jwt.verify(vtoken, "fightlikeurthethirdmonkey");
-  // const user = await userVerification.findOne({
-  //   _id: decoded._id,
-  //   verificationToken: vtoken,
-  // });
-  try {
-    const verification = await UserVerification.verify(req.query);
-    if (verification.status == "success") {
-      const user = await User.findById({ _id: verification.id });
-      user.status = "active";
-      await user.save();
-
-      res.redirect(`http://localhost:3001/newurl`);
-      // res.status(200).send("success");
-    } else {
-      throw new Error(verification.message);
-    }
-  } catch (e) {
-    res.status(500).send(e.message);
-  }
-});
-router.post("/user/generateotp", async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
-  try {
-    //send email to the user with a confirmation link
-    const otp = new Otp({
-      userId: user._id,
-    });
-    //save otp
-    await otp.save();
-    // verification token
-    const generatedOtp = await otp.generateOtp();
-    // send email
-    const data = {
-      name: user.name,
-      email: user.email,
-      otpVerification: generatedOtp,
-    };
-    await sendEmail(data);
-
-    res.status(201).send({ s: "success" });
-  } catch (error) {
-    res.status(500).send(error.message);
   }
 });
 router.post("/user/verifyotp", async (req, res) => {
