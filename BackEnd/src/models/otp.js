@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const otpGenerator = require("otp-generator");
 
+//const x= require("otp-generator")
+
 const otpSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -20,17 +22,10 @@ const otpSchema = new mongoose.Schema({
   },
 });
 
-console.log(
-  otpGenerator.generate(6, {
-    lowerCaseAlphabets: false,
-    upperCaseAlphabets: false,
-    specialChars: false,
-  })
-);
 
 // gernerates otp
 otpSchema.methods.generateOtp = async function () {
-  otp = otpGenerator.generate(6, {
+  var otp = otpGenerator.generate(6, {
     upperCaseAlphabets: false,
     specialChars: false,
   });

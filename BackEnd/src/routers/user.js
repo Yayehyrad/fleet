@@ -36,24 +36,26 @@ router.post("/users", validateUserInput, async (req, res) => {
 
     res.status(201).send({ user, token, userVerification, vtoken });
 
-    const payload = {
-      description: "Registration of a new user",
-      user_name: req.body.user_name,
-      timestamps: Date.now(),
-      Ip: req.ip,
-    };
+        const payload = {
+            "description":"Registration of a new user",
+            "user_name":req.body.user_name,
+            "timestamps":Date.now(),
+            "Ip":req.ip
 
-    const activiy = new Activity(payload);
-    await activiy.save();
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-router.post("/user/login", async (req, res) => {
-  try {
-    const user = await User.findByCredentias(req.body.email, req.body.password);
+        }
 
-    const token = await user.generateAuthToken();
+        const activiy = new Activity(payload)
+        await activiy.save()
+        
+    }catch(error){
+        res.status(500).send(error.message)
+    }    
+})
+router.post('/user/login' , async (req, res )=>{
+    try{
+        const user = await User.findByCredentias(req.body.email , req.body.password)
+        
+        const token = await user.generateAuthToken()
 
     const payload = {
       description: "Login Activity",

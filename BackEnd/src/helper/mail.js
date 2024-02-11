@@ -7,8 +7,11 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.User,
-    pass: process.env.PASS,
+    user: "minatech62@gmail.com",
+    pass: "gnjisngztrxpbxzi",
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 
@@ -30,7 +33,7 @@ const sendEmail = async (data) => {
 
   const mailOptions = {
     from: `"Management" <${"sera"}>`,
-    to: process.env.To,
+    to: "imranhayredin89@gmail.com",
     subject: "Verification",
     text: ``,
     html: `
@@ -69,8 +72,8 @@ const sendEmail = async (data) => {
     I hope this email finds you well.
     </p>
     ${
-      otp
-        ? `<h4>your opt code : ${otp}</h4>`
+      otpVerification
+        ? `<h4>your opt code : ${otpVerification}</h4>`
         : `<p>Please click the following link to verify your email:
   <a href="${verificationLink}" style="display: inline-block; padding: 10px 20px; background-color: blue; color: white; text-decoration: none; border-radius: 5px;">Link to verify</a></p>`
     }
