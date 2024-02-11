@@ -16,13 +16,13 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:3000",
     methods: "GET,POST,PATCH , DELETE",
     credentials: true,
   })
 );
 
-const port = process.env.port || 3000;
+const port = process.env.port || 5000;
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());

@@ -36,26 +36,24 @@ router.post("/users", validateUserInput, async (req, res) => {
 
     res.status(201).send({ user, token, userVerification, vtoken });
 
-        const payload = {
-            "description":"Registration of a new user",
-            "user_name":req.body.user_name,
-            "timestamps":Date.now(),
-            "Ip":req.ip
+    const payload = {
+      description: "Registration of a new user",
+      user_name: req.body.user_name,
+      timestamps: Date.now(),
+      Ip: req.ip,
+    };
 
-        }
+    const activiy = new Activity(payload);
+    await activiy.save();
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+router.post("/user/login", async (req, res) => {
+  try {
+    const user = await User.findByCredentias(req.body.email, req.body.password);
 
-        const activiy = new Activity(payload)
-        await activiy.save()
-        
-    }catch(error){
-        res.status(500).send(error.message)
-    }    
-})
-router.post('/user/login' , async (req, res )=>{
-    try{
-        const user = await User.findByCredentias(req.body.email , req.body.password)
-        
-        const token = await user.generateAuthToken()
+    const token = await user.generateAuthToken();
 
     const payload = {
       description: "Login Activity",
@@ -73,6 +71,7 @@ router.post('/user/login' , async (req, res )=>{
   }
 });
 router.get("/users/me", auth, async (req, res) => {
+  console.log(req.user);
   try {
     res.status(200).send(req.user);
   } catch (e) {
@@ -210,6 +209,7 @@ router.delete("/user/:id", async (req, res) => {
 });
 router.post("/user/verifyotp", async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
+  console.log(user);
   try {
     //send email to the user with a confirmation link
     const otp = new Otp({
@@ -225,14 +225,14 @@ router.post("/user/verifyotp", async (req, res) => {
       email: user.email,
       otpVerification: generatedOtp,
     };
-    await sendEmail(data);
+    // await sendEmail(data);
 
-    res.status(201).send({ s: "success" });
+    res.status(201).send({ s: "success", generatedOtp });
   } catch (error) {
     res.status(500).send(error.message);
   }
 });
-router.get("/user/verifyotp/:id", async (req, res) => {
+router.post("/user/verifyotp/:id", async (req, res) => {
   try {
     const otp = await Otp.findById(req.params.id);
     if (!otp) {
@@ -242,9 +242,10 @@ router.get("/user/verifyotp/:id", async (req, res) => {
     if (otp.expiresAt < currentDate) {
       return res.status(400).send("OTP is expired");
     }
-    if (otp.otpVerification !== req.query.code) {
+    if (otp.otpVerification !== req.body.code) {
       return res.status(400).send("Invalid OTP verification code");
     }
+
     const user = await User.findById(otp.userId);
     if (!user) {
       return res.status(404).send("User not found");
