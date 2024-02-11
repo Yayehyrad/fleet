@@ -12,6 +12,18 @@ const validateUserInput = require("../middleware/validator");
 const router = new express.Router();
 const sendEmail = require("../helper/mail");
 const check_attempt = require("../middleware/check_attempt");
+const user = require("./user.docs");
+router.get("/users/all",async (req,res)=>{
+  try {
+    const users = await User.find({});
+    res.status(200).json(users)
+    
+  } catch (err) {
+    console.error(err);
+    res.status(400).json("message", err.message)
+  }
+
+})
 
 router.post("/users", validateUserInput, async (req, res) => {
   const user = new User(req.body);
@@ -23,16 +35,16 @@ router.post("/users", validateUserInput, async (req, res) => {
       userId: user._id,
     });
     //save verification
-    await userVerification.save();
-    const token = await user.generateAuthToken();
-    const vtoken = await userVerification.generateAuthToken();
+    //await userVerification.save();
+    //const token = await user.generateAuthToken();
+    //const vtoken = await userVerification.generateAuthToken();
     // send email
-    const data = {
-      name: user.name,
-      email: user.email,
-      verificationToken: vtoken,
-    };
-    await sendEmail(data);
+   // const data = {
+     // name: user.name,
+     // email: user.email,
+      //verificationToken: vtoken,
+    //};
+    //await sendEmail(data);
 
     res.status(201).send({ user, token, userVerification, vtoken });
 
@@ -199,7 +211,7 @@ router.delete("/user/delete", auth, admin_auth, async (req, res) => {
 });
 router.delete("/user/:id", async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.user._id);
+    const user = await User.findByIdAndDelete(req.params.id); //here
     if (!user) {
       return res.status(404).send("not found");
     }
