@@ -29,7 +29,7 @@ const sendEmail = async (data) => {
     otpVerification = null,
   } = data;
   console.log(name, email, verificationToken, otpVerification);
-  const verificationLink = `http://localhost:3000/verify?token=${verificationToken}`; // Replace example.com with your actual verification route
+  const verificationLink = `https://example.com/verify?token=${verificationToken}`; // Replace example.com with your actual verification route
 
   const mailOptions = {
     from: `"Management" <${"sera"}>`,

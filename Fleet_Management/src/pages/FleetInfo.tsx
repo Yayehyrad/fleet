@@ -30,12 +30,12 @@ function FleetInfo(): JSX.Element {
     refetch();
     // fetchData(id:Number)
   };
-  // if (isLoading) {
-  //   return <p>Loading...</p>;
-  // }
-  // if (isError || data === undefined) {
-  //   return <p>Error loading data</p>;
-  // }
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+  if (isError || data === undefined) {
+    return <p>Error loading data</p>;
+  }
   return (
     <div>
       <NavBar />
