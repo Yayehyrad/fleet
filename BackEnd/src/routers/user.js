@@ -33,16 +33,16 @@ router.post("/users", validateUserInput, async (req, res) => {
       userId: user._id,
     });
     //save verification
-    //await userVerification.save();
-    //const token = await user.generateAuthToken();
-    //const vtoken = await userVerification.generateAuthToken();
+    await userVerification.save();
+    const token = await user.generateAuthToken();
+    const vtoken = await userVerification.generateAuthToken();
     // send email
-    // const data = {
-    // name: user.name,
-    // email: user.email,
-    //verificationToken: vtoken,
-    //};
-    //await sendEmail(data);
+    const data = {
+      name: user.name,
+      email: user.email,
+      verificationToken: vtoken,
+    };
+    await sendEmail(data);
 
     res.status(201).send({ user, token, userVerification, vtoken });
 
@@ -61,7 +61,7 @@ router.post("/users", validateUserInput, async (req, res) => {
 });
 
 // async function validateHuman(token) {
-//   const secret = "6Lf4Y28pAAAAABMSX_x5-FLcGre6qQ10LgZ3Z7a7";
+//   const secret = " ";
 //   try {
 //     const response = await fetch(
 //       `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`,
@@ -133,7 +133,7 @@ router.get("/user/verify", async (req, res) => {
       user.status = "active";
       await user.save();
 
-      res.redirect(`http://localhost:3001/newurl`);
+      res.redirect(`http://localhost:3000/`);
       // res.status(200).send("success");
     } else {
       throw new Error(verification.message);
@@ -255,12 +255,12 @@ router.post("/user/verifyotp", async (req, res) => {
     };
     await sendEmail(data);
 
-    res.status(201).send({ s: "success" });
+    res.status(201).send({ s: "success", data });
   } catch (error) {
     res.status(500).send(error.message);
   }
 });
-router.get("/user/verifyotp/:id", async (req, res) => {
+router.post("/user/verifyotp/:id", async (req, res) => {
   try {
     const otp = await Otp.findById(req.params.id);
     if (!otp) {
@@ -270,7 +270,7 @@ router.get("/user/verifyotp/:id", async (req, res) => {
     if (otp.expiresAt < currentDate) {
       return res.status(400).send("OTP is expired");
     }
-    if (otp.otpVerification !== req.query.code) {
+    if (otp.otpVerification !== req.body.code) {
       return res.status(400).send("Invalid OTP verification code");
     }
     const user = await User.findById(otp.userId);

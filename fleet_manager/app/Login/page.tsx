@@ -10,14 +10,15 @@ import Recapcha from "react-google-recaptcha";
 
 //const jwt = require('jsonwebtoken')
 //import { useJwt } from 'react-jwt';
-const handleOneTimePassword = async (e: any, email: string) => {
+const handleOneTimePassword = async (e: any, email: string, router) => {
   console.log("clicked");
   try {
     const response = await axios.post("http://localhost:5000/user/verifyotp", {
       email,
     });
-    console.log(response.data);
-    redirect("/Otp");
+    console.log(response.data, response.data.data.otpVerification._id);
+    Cookies.set("otp_id", response.data.data.otpVerification._id);
+    router.push("/opt");
   } catch (error) {
     console.error(error);
   }
@@ -26,21 +27,24 @@ const handleSublmit = async (
   e: any,
   email: string,
   password: string,
-  token
+  token,
+  router
 ) => {
   console.log("clicked");
   e.preventDefault();
-  if (!token) {
-    alert("Please verify the captcha");
-    return;
-  }
+  // if (!token) {
+  //   alert("Please verify the captcha");
+  //   return;
+  // }
   try {
     const response = await axios.post("http://localhost:5000/user/login", {
       email: email,
       password: password,
     });
-    console.log(response.data.token);
+    console.log(response.data);
     Cookies.set("token", "Bearer " + response.data.token);
+    Cookies.set("Role", response.data.user.role);
+    router.push(`/${response.data.user.role}`);
   } catch (error) {
     console.error(error);
   }
@@ -72,7 +76,7 @@ const Login = () => {
       />
       <form
         className="flex flex-col items-center"
-        onSubmit={(e) => handleSublmit(e, email, password, token)}
+        onSubmit={(e) => handleSublmit(e, email, password, token, router)}
       >
         <input
           className="border-2 border-blue-500 w-80 h-12 my-4 rounded px-4 text-blue-500"
@@ -92,11 +96,11 @@ const Login = () => {
           value={password}
           required
         />
-        <Recapcha
+        {/* <Recapcha
           sitekey={process.env.NEXT_PUBLIC_API_KEY}
           onChange={handleRecaptchaChange}
           className=" m-auto"
-        />
+        /> */}
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mt-2 w-25"
           type="submit"
@@ -109,7 +113,7 @@ const Login = () => {
           style={{ textAlign: "center", color: "white", marginTop: "5px" }}
         ></p>
       </form>
-      <button onClick={(e) => handleOneTimePassword(e, email)}>
+      <button onClick={(e) => handleOneTimePassword(e, email, router)}>
         Use one time password
       </button>
     </div>
