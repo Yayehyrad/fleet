@@ -29,11 +29,11 @@ const sendEmail = async (data) => {
     otpVerification = null,
   } = data;
   console.log(name, email, verificationToken, otpVerification);
-  const verificationLink = `https://example.com/verify?token=${verificationToken}`; // Replace example.com with your actual verification route
+  const verificationLink = `http://localhost:5000/user/verify?token=${verificationToken}`; // Replace example.com with your actual verification route
 
   const mailOptions = {
     from: `"Management" <${"sera"}>`,
-    to: "imranhayredin89@gmail.com",
+    to: `${email}`,
     subject: "Verification",
     text: ``,
     html: `
@@ -73,9 +73,9 @@ const sendEmail = async (data) => {
     </p>
     ${
       otpVerification
-        ? `<h4>your opt code : ${otpVerification}</h4>`
+        ? `<h4>your opt code : ${otpVerification.otpVerification}</h4>`
         : `<p>Please click the following link to verify your email:
-  <a href="${verificationLink}" style="display: inline-block; padding: 10px 20px; background-color: blue; color: white; text-decoration: none; border-radius: 5px;">Link to verify</a></p>`
+  <a href="${verificationLink}" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: blue; color: white; text-decoration: none; border-radius: 5px;">Link to verify</a></p>`
     }
      
     <h3>Sincerely,</h3>
