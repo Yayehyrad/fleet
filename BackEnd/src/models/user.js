@@ -75,7 +75,6 @@ userSchima.virtual("userVerification", {
   localField: "_id",
   foreignField: "userId",
 });
-
 userSchima.methods.generateAuthToken = async function () {
 
   const payload = {
