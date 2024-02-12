@@ -18,7 +18,7 @@ interface User{
 
 const x:User[] = []
 
-const Admin = ()=>
+const Manager = ()=>
 {
   const router = useRouter()
   const [Data,setData] = React.useState(x)
@@ -84,9 +84,7 @@ const Admin = ()=>
             Add
           </Link>
 
-          <Link href="/Admin/Activity">
-            Activities
-          </Link>
+        
       </ul>
     </div>
   </div>
@@ -99,7 +97,7 @@ const Admin = ()=>
 </div>
         
      
-               <h1 className="text-center text-cyan-700 text-4xl m-7 ">All Users</h1>
+               <h1 className="text-center text-cyan-700 text-4xl m-7 ">All Drivers</h1>
 
                <div className="overflow-x-auto">
   <table className="table table-zebra">
@@ -118,6 +116,9 @@ const Admin = ()=>
       </tr>
       {
        Data.map((value, index) => {
+        if(value.role === "Driver")
+        {
+
         return(
           <tr key={value._id}>
           <th></th>
@@ -133,6 +134,7 @@ const Admin = ()=>
         </tr>
 
         )
+       }
       })
     
          
@@ -157,5 +159,5 @@ const Admin = ()=>
 }
 
 //export default isAdmin(Admin)
-export default Admin
+export default Manager
 

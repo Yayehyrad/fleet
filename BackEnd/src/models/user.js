@@ -4,7 +4,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Task = require("./task");
 
-
 const userSchima = new mongoose.Schema({
   name: {
     type: String,
