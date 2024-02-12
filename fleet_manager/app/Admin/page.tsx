@@ -156,6 +156,6 @@ const Admin = ()=>
     )
 }
 
-//export default isAdmin(Admin)
-export default Admin
+export default isAdmin(Admin)
+//export default Admin
 
