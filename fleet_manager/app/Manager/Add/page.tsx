@@ -96,7 +96,7 @@ params.append('password', Data.password);
   
   </div>
 </div>
-        <h1 className="text-center text-cyan-700 text-4xl m-7 ">Add New User</h1>
+        <h1 className="text-center text-cyan-700 text-4xl m-7 ">Add Driver</h1>
         <div className="flex flex-col items-center">
   <input type="text" value={Data.name}  onChange={(e) => {
     setData((prevData) => ({ ...prevData, name: e.target.value }));
