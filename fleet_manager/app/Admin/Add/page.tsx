@@ -37,24 +37,13 @@ const Add = () => {
       params.append("status", Data.status);
 
       params.append("password", Data.password);
-      alert(Data.name);
-
-      const response = await axios.post(
-        "http://localhost:5000/users",
-        {
-          name: "newperson",
-          user_name: "yay",
-          email: "",
-          password: "New1234@",
-          role: "Admin",
-          status: "pending",
+      // alert(Data.name);
+      console.log(params);
+      const response = await axios.post("http://localhost:5000/users", Data, {
+        headers: {
+          Authorization: Cookies.get("token"),
         },
-        {
-          headers: {
-            Authorization: Cookies.get("token"),
-          },
-        }
-      );
+      });
 
       if (response.status === 200) {
         const data = await response.data;
