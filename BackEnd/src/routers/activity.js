@@ -3,6 +3,18 @@ const Activity = require("../models/activity");
 // const auth = require("../middleware/auth");
 const router = new express.Router();
 
+router.get("/activity/all",async (req,res)=>{
+    try {
+      const activity = await Activity.find({});
+      res.status(200).json(activity)
+      
+    } catch (err) {
+      console.error(err);
+      res.status(400).json("message", err.message)
+    }
+  
+  })
+
 // router.post("/fleet", async (req, res) => {
 //   // console.log(req.body);
 //   const {

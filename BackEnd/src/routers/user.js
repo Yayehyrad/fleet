@@ -24,6 +24,25 @@ router.get("/users/all",async (req,res)=>{
   }
 
 })
+router.patch("/users/update/:id",async (req,res)=>{
+  try {
+    const updatedDocument = await User.updateOne({ _id: req.params.id }, req.body);
+    res.status(200).json(updatedDocument)
+  } catch (error) {
+    console.error(err);
+    res.status(400).json("message", err.message)
+  }
+})
+router.get("/users/:id",async (req,res)=>{
+  try {
+    const user = await User.findById({ _id: req.params.id });
+    res.status(200).json(user)
+    
+  } catch (err) {
+    console.error(err);
+    res.status(400).json("message", err.message)
+  }
+})
 
 router.post("/users", validateUserInput, async (req, res) => {
   const user = new User(req.body);
