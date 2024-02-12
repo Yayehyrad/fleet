@@ -84,9 +84,7 @@ const Manager = ()=>
             Add
           </Link>
 
-          <Link href="/Admin/Activity">
-            Activities
-          </Link>
+        
       </ul>
     </div>
   </div>
@@ -99,7 +97,7 @@ const Manager = ()=>
 </div>
         
      
-               <h1 className="text-center text-cyan-700 text-4xl m-7 ">Add Driver</h1>
+               <h1 className="text-center text-cyan-700 text-4xl m-7 ">All Drivers</h1>
 
                <div className="overflow-x-auto">
   <table className="table table-zebra">

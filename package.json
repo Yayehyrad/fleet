@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "antd": "^5.11.4"
+    "antd": "^5.11.4",
+    "mkcert": "^3.2.0"
   }
 }

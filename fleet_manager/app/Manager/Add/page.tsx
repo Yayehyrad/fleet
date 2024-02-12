@@ -83,9 +83,7 @@ params.append('password', Data.password);
             Add
           </Link>
 
-          <Link href="/Admin/Activity">
-            Activities
-          </Link>
+        
       </ul>
     </div>
   </div>
